@@ -6,8 +6,9 @@ import argparse
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
+from notifier import Notification
 
-
+nf = Notification()
 # Base directory for paths
 SCRIPT_DIR = Path(__file__).parent.resolve()
 
@@ -140,6 +141,7 @@ def run_scraper(csv_path, start_row=1, end_row=None):
                     def notify_captcha():
                         try:
                             from plyer import notification
+                            nf.push("VIRUSTOTAL SCRAPPER\n CAPTCHA DETECTED! Please solve it in the browser.")
                             notification.notify(title="VirusTotal Scraper", message="CAPTCHA DETECTED! Please solve it in the browser.", timeout=10)
                         except Exception:
                             pass
@@ -159,6 +161,7 @@ def run_scraper(csv_path, start_row=1, end_row=None):
                             notify_captcha()
                             while is_captcha_present():
                                 print("    [!] Please solve the CAPTCHA in the open Chromium browser...")
+                                nf.push("VIRUSTOTAL SCRAPPER\n Please solve the CAPTCHA in the open Chromium browser...")
                                 print('\a', end='', flush=True) # Ring bell
                                 time.sleep(4)
                                 
@@ -193,6 +196,7 @@ def run_scraper(csv_path, start_row=1, end_row=None):
                             if is_captcha_present():
                                 notify_captcha()
                                 while is_captcha_present():
+                                    nf.push("VIRUSTOTAL SCRAPPER\n Please solve the CAPTCHA in the browser window..")
                                     print("    [!] Please solve the CAPTCHA in the browser window...")
                                     print('\a', end='', flush=True)
                                     time.sleep(4)
@@ -266,4 +270,5 @@ if __name__ == "__main__":
         print(f"[-] File not found: {csv_file}")
     else:
         print(f"[*] Using Profile Directory: {USER_DATA_DIR}")
-        run_scraper(csv_file, args.start, args.end)
+        nf.push(f"VIRUSTOTAL SCRAPPER\nRunning the scrapper with\nProfile: {args.profile}\nStart: {args.start}\nEnd: {args.end}")
+        run_scraper(csv_file, args.start, args.end,)
